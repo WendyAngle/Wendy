@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    
+    <title>koa源码分析 | 云的空间</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+        <meta name="keywords" content="koa" />
+    
+    <meta name="description" content="在阅读文章之前，最好对koa(koa 2)有个基本的了解，最简单的方式从如下链接了解Koa - next generation web framework for node.jskoajs/koa: Expressive middleware for node.js using ES2017 async functionsKoa koa 源码结构 application.js   入口文件，导出">
+<meta name="keywords" content="koa">
+<meta property="og:type" content="article">
+<meta property="og:title" content="koa源码分析">
+<meta property="og:url" content="https://xiangwenhu.github.io/2017/07/29/sourecode/koa/index.html">
+<meta property="og:site_name" content="云的空间">
+<meta property="og:description" content="在阅读文章之前，最好对koa(koa 2)有个基本的了解，最简单的方式从如下链接了解Koa - next generation web framework for node.jskoajs/koa: Expressive middleware for node.js using ES2017 async functionsKoa koa 源码结构 application.js   入口文件，导出">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://xiangwenhu.github.io/blog/img/koa.jpg">
+<meta property="og:updated_time" content="2017-08-23T05:54:37.124Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="koa源码分析">
+<meta name="twitter:description" content="在阅读文章之前，最好对koa(koa 2)有个基本的了解，最简单的方式从如下链接了解Koa - next generation web framework for node.jskoajs/koa: Expressive middleware for node.js using ES2017 async functionsKoa koa 源码结构 application.js   入口文件，导出">
+<meta name="twitter:image" content="https://xiangwenhu.github.io/blog/img/koa.jpg">
+    
+
+    
+
+    
+
+    <link rel="stylesheet" href="/blog/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/blog/libs/titillium-web/styles.css">
+    <link rel="stylesheet" href="/blog/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/blog/css/style.css">
+
+    <script src="/blog/libs/jquery/2.0.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/blog/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/blog/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="wrap">
+        <header id="header">
+    <div id="header-outer" class="outer">
+        <div class="container">
+            <div class="container-inner">
+                <div id="header-title">
+                    <h1 class="logo-wrap">
+                        <a href="/blog/" class="logo"></a>
+                    </h1>
+                    
+                        <h2 class="subtitle-wrap">
+                            <p class="subtitle" style="line-height:80px">随笔，日记，博客，学习等集合体，打开它，总有收获</p>
+                            <p class="subtitle" style="line-height:30px;text-align:left;font-style:normal">
+                                <span id="busuanzi_container_site_pv">
+                                    总访问量<span id="busuanzi_value_site_pv" style="color:bisque">-</span>次
+                                </span>
+                                <span id="busuanzi_container_site_uv">
+                                    访客数<span id="busuanzi_value_site_uv" style="color:bisque">-</span>人次
+                                  </span>
+                            </p>
+                        </h2>
+                    
+                </div>
+                <div id="header-inner" class="nav-container">
+                    <a id="main-nav-toggle" class="nav-icon fa fa-bars"></a>
+                    <div class="nav-container-inner">
+                        <ul id="main-nav">
+                            
+                                <li class="main-nav-list-item" >
+                                    <a class="main-nav-list-link" href="/blog/">主页</a>
+                                </li>
+                            
+                                        <ul class="main-nav-list"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/其他/">其他</a><ul class="main-nav-list-child"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/其他/github/">github</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/其他/浏览器/">浏览器</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/其他/网络/">网络</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/其他/资源/">资源</a></li></ul></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/源码/">源码</a></li></ul>
+                                    
+                                <li class="main-nav-list-item" >
+                                    <a class="main-nav-list-link" href="/blog/about.html">关于</a>
+                                </li>
+                            
+                        </ul>
+                        <nav id="sub-nav">
+                            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/blog/',
+        CONTENT_URL: '/blog/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/blog/js/insight.js"></script>
+
+</div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+        <div class="container">
+            <div class="main-body container-inner">
+                <div class="main-body-inner">
+                    <section id="main">
+                        <div class="main-body-header">
+    <h1 class="header">
+    
+    <a class="page-title-link" href="/blog/categories/源码/">源码</a>
+    </h1>
+</div>
+                        <div class="main-body-content">
+                            <article id="post-sourecode/koa" class="article article-single article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+        koa源码分析
+        </h1>
+    
+
+            </header>
+         
+        
+            <div class="article-meta">
+                
+    <div class="article-date">
+        <a href="/blog/2017/07/29/sourecode/koa/" class="article-date">
+            <time datetime="2017-07-29T10:00:00.000Z" itemprop="datePublished">2017-07-29</time>
+        </a>
+    </div>
+
+                
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/blog/tags/koa/">koa</a>
+    </div>
+
+            </div>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+            <p>在阅读文章之前，最好对koa(koa 2)有个基本的了解，最简单的方式从如下链接了解<br><a href="http://koajs.com/" target="_blank" rel="external">Koa - next generation web framework for node.js</a><br><a href="https://github.com/koajs/koa" target="_blank" rel="external">koajs/koa: Expressive middleware for node.js using ES2017 async functions</a><br><a href="https://www.npmjs.com/package/koa" target="_blank" rel="external">Koa</a></p>
+<h2 id="koa-源码结构"><a href="#koa-源码结构" class="headerlink" title="koa 源码结构"></a>koa 源码结构</h2><ul>
+<li>application.js<br>   入口文件，导出  class Application            <pre><code>`const Koa = require(&apos;koa&apos;);`,代码里面的Koa就是Application     
+</code></pre></li>
+<li><p>context.js<br>  可以理解为中间件里面的ctx,比如如下的ctx</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">app.use(<span class="keyword">async</span> ctx =&gt; &#123;</div><div class="line">  ctx.body = <span class="string">'Hello World'</span>;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+</li>
+<li><p>request<br>对原生request的一些属性封装 </p>
+</li>
+<li>response<br>对原生response的一些属性封装 </li>
+</ul>
+<h2 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h2><h3 id="request-js"><a href="#request-js" class="headerlink" title="request.js"></a>request.js</h3><p>都是返回一个对象，分别对原生request进行了封装，<br>注意的是 this.req, 整个文件中并没有req的申明,其就是原生http中request对象的引用<br>this.ctx 是对ctx的引用<br>这个等到context.js和application.js再解释，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line">module.exports = &#123;</div><div class="line">  /**</div><div class="line">   * Return request header.</div><div class="line">   *</div><div class="line">   * @return &#123;Object&#125;</div><div class="line">   * @api public</div><div class="line">   */</div><div class="line"></div><div class="line">  get header() &#123;</div><div class="line">    return this.req.headers;</div><div class="line">  &#125;,</div><div class="line">  ......</div><div class="line">```    </div><div class="line">    </div><div class="line">### response.js</div><div class="line">都是返回一个对象，分别对原生response进行了封装，    </div><div class="line">注意的是 this.res, 整个文件中并没有res的申明,其就是原生http中response对象的引用      </div><div class="line">this.ctx是对ctx的引用，</div><div class="line">这个等到context.js和application.js再解释，</div><div class="line">```javascript</div><div class="line">module.exports = &#123;</div><div class="line">  /**</div><div class="line">   * Return the request socket.</div><div class="line">   *</div><div class="line">   * @return &#123;Connection&#125;</div><div class="line">   * @api public</div><div class="line">   */</div><div class="line"></div><div class="line">  get socket() &#123;</div><div class="line">    return this.ctx.req.socket;</div><div class="line">  &#125;,</div><div class="line">   /**</div><div class="line">   * Return response header.</div><div class="line">   *</div><div class="line">   * @return &#123;Object&#125;</div><div class="line">   * @api public</div><div class="line">   */</div><div class="line">  get header() &#123;</div><div class="line">    const &#123; res &#125; = this;</div><div class="line">    return typeof res.getHeaders === &apos;function&apos;</div><div class="line">      ? res.getHeaders()</div><div class="line">      : res._headers || &#123;&#125;;  // Node &lt; 7.7</div><div class="line">  &#125;,</div><div class="line">  ......</div></pre></td></tr></table></figure></p>
+<h3 id="context-js"><a href="#context-js" class="headerlink" title="context.js"></a>context.js</h3><p>本身不复杂，申请一个对象，然后调用delegate代理方法和属性<br>妙就妙在这个 delegate，个人觉得是koa精髓之一<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> createError = <span class="built_in">require</span>(<span class="string">'http-errors'</span>);</div><div class="line"><span class="keyword">const</span> httpAssert = <span class="built_in">require</span>(<span class="string">'http-assert'</span>);</div><div class="line"><span class="keyword">const</span> delegate = <span class="built_in">require</span>(<span class="string">'delegates'</span>);</div><div class="line"><span class="keyword">const</span> statuses = <span class="built_in">require</span>(<span class="string">'statuses'</span>);</div><div class="line"></div><div class="line"><span class="keyword">const</span> proto = <span class="built_in">module</span>.exports = &#123;</div><div class="line">    ......</div><div class="line">&#125;</div><div class="line"></div><div class="line">delegate(proto, <span class="string">'response'</span>)</div><div class="line">  .method(<span class="string">'attachment'</span>)</div><div class="line">  .method(<span class="string">'redirect'</span>)</div><div class="line">  .method(<span class="string">'remove'</span>)</div><div class="line">  .method(<span class="string">'vary'</span>)</div><div class="line">  .method(<span class="string">'set'</span>)</div><div class="line">  .method(<span class="string">'append'</span>)</div><div class="line">  .method(<span class="string">'flushHeaders'</span>)</div><div class="line">  .access(<span class="string">'status'</span>)</div><div class="line">  .access(<span class="string">'message'</span>)</div><div class="line">  .access(<span class="string">'body'</span>)</div><div class="line">  .access(<span class="string">'length'</span>)</div><div class="line">  .access(<span class="string">'type'</span>)</div><div class="line">  .access(<span class="string">'lastModified'</span>)</div><div class="line">  .access(<span class="string">'etag'</span>)</div><div class="line">  .getter(<span class="string">'headerSent'</span>)</div><div class="line">  .getter(<span class="string">'writable'</span>);</div><div class="line">  ......</div></pre></td></tr></table></figure></p>
+<p>我们来看一段delegates的源码, 源码在github的地址为 <a href="https://github.com/tj/node-delegates" target="_blank" rel="external">node delegates</a><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"><span class="comment"> * Initialize a delegator.</span></div><div class="line"><span class="comment"> *</span></div><div class="line"><span class="comment"> * @param &#123;Object&#125; proto</span></div><div class="line"><span class="comment"> * @param &#123;String&#125; target</span></div><div class="line"><span class="comment"> * @api public</span></div><div class="line"><span class="comment"> */</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Delegator</span>(<span class="params">proto, target</span>) </span>&#123;</div><div class="line">  <span class="keyword">if</span> (!(<span class="keyword">this</span> <span class="keyword">instanceof</span> Delegator)) <span class="keyword">return</span> <span class="keyword">new</span> Delegator(proto, target);</div><div class="line">  <span class="keyword">this</span>.proto = proto;</div><div class="line">  <span class="keyword">this</span>.target = target;</div><div class="line">  <span class="keyword">this</span>.methods = [];</div><div class="line">  <span class="keyword">this</span>.getters = [];</div><div class="line">  <span class="keyword">this</span>.setters = [];</div><div class="line">  <span class="keyword">this</span>.fluents = [];</div><div class="line">&#125;</div><div class="line"></div><div class="line">Delegator.prototype.method = <span class="function"><span class="keyword">function</span>(<span class="params">name</span>)</span>&#123;</div><div class="line">  <span class="keyword">var</span> proto = <span class="keyword">this</span>.proto;</div><div class="line">  <span class="keyword">var</span> target = <span class="keyword">this</span>.target;</div><div class="line">  <span class="keyword">this</span>.methods.push(name);</div><div class="line">  <span class="comment">//添加方法，</span></div><div class="line">  proto[name] = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="comment">//实际执行的时候，是 proto target属性上的name方法</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>[target][name].apply(<span class="keyword">this</span>[target], <span class="built_in">arguments</span>);</div><div class="line">  &#125;;</div><div class="line"></div><div class="line">  <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>简单理解就是在proto上添加了一个方法，实际执行的时候是执行proto对象target属性上的方法，方法执行时的上下文是target属性<br>那么回归我们的源码，<br><strong>context.js 那里面一堆的method,access,getter就是把request和response的方法在context在开了一个窗口，最终还是执行request和response的方法或者getter，setter<br>最终的结果就是ctx有所有response和request的方法和getter,setter。主要是方便使用了。</strong><br>额外提一下<br>delegate.access 表示可以读写<br>delegate.setter 表示可以写<br>delegate.getter 表示可以读 </p>
+<p>我们再来看一段 application.js的代码<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line">......</div><div class="line"><span class="keyword">const</span> context = <span class="built_in">require</span>(<span class="string">'./context'</span>);</div><div class="line">......</div><div class="line"></div><div class="line"><span class="built_in">module</span>.exports = <span class="class"><span class="keyword">class</span> <span class="title">Application</span> <span class="keyword">extends</span> <span class="title">Emitter</span> </span>&#123;</div><div class="line">  <span class="comment">/**</span></div><div class="line"><span class="comment">   * Initialize a new `Application`.</span></div><div class="line"><span class="comment">   *</span></div><div class="line"><span class="comment">   * @api public</span></div><div class="line"><span class="comment">   */</span></div><div class="line"></div><div class="line">  <span class="keyword">constructor</span>() &#123;</div><div class="line">    <span class="keyword">super</span>();</div><div class="line"></div><div class="line">    <span class="keyword">this</span>.proxy = <span class="literal">false</span>;</div><div class="line">    <span class="keyword">this</span>.middleware = [];</div><div class="line">    <span class="keyword">this</span>.subdomainOffset = <span class="number">2</span>;</div><div class="line">    <span class="keyword">this</span>.env = process.env.NODE_ENV || <span class="string">'development'</span>;</div><div class="line">    <span class="comment">// ##1 </span></div><div class="line">    <span class="keyword">this</span>.context = <span class="built_in">Object</span>.create(context);</div><div class="line">    <span class="keyword">this</span>.request = <span class="built_in">Object</span>.create(request);</div><div class="line">    <span class="keyword">this</span>.response = <span class="built_in">Object</span>.create(response);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  createContext(req, res) &#123;</div><div class="line">    <span class="comment">// ##2</span></div><div class="line">    <span class="keyword">const</span> context = <span class="built_in">Object</span>.create(<span class="keyword">this</span>.context);</div><div class="line">    <span class="keyword">const</span> request = context.request = <span class="built_in">Object</span>.create(<span class="keyword">this</span>.request);</div><div class="line">    <span class="keyword">const</span> response = context.response = <span class="built_in">Object</span>.create(<span class="keyword">this</span>.response);</div><div class="line">    context.app = request.app = response.app = <span class="keyword">this</span>;</div><div class="line">    context.req = request.req = response.req = req;</div><div class="line">    context.res = request.res = response.res = res;</div><div class="line">    request.ctx = response.ctx = context;</div><div class="line">    request.response = response;</div><div class="line">    response.request = request;</div><div class="line">    context.originalUrl = request.originalUrl = req.url;</div><div class="line">    context.cookies = <span class="keyword">new</span> Cookies(req, res, &#123;</div><div class="line">      keys: <span class="keyword">this</span>.keys,</div><div class="line">      secure: request.secure</div><div class="line">    &#125;);</div><div class="line">    request.ip = request.ips[<span class="number">0</span>] || req.socket.remoteAddress || <span class="string">''</span>;</div><div class="line">    context.accept = request.accept = accepts(req);</div><div class="line">    context.state = &#123;&#125;;</div><div class="line">    <span class="keyword">return</span> context;</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+<p>注意<code>##1</code>，<code>##2</code>标记的地方，重点看 ##2，先看这3行<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> context = <span class="built_in">Object</span>.create(<span class="keyword">this</span>.context);</div><div class="line"><span class="keyword">const</span> request = context.request = <span class="built_in">Object</span>.create(<span class="keyword">this</span>.request);</div><div class="line"><span class="keyword">const</span> response = context.response = <span class="built_in">Object</span>.create(<span class="keyword">this</span>.response);</div></pre></td></tr></table></figure></p>
+<p>先创建context,实际上这个时候，已经有request和repsonse的方法或者getter，setter了，但是光有这个不行啊，因为最终调用时 request和response的方法，第二三句代码就是添加request和response属性。</p>
+<p>解析来看看这几句代码，就能解惑上面 response和request的疑问了<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">context.app = request.app = response.app = <span class="keyword">this</span>;</div><div class="line">context.req = request.req = response.req = req;</div><div class="line">context.res = request.res = response.res = res;</div><div class="line">request.ctx = response.ctx = context;</div><div class="line">request.response = response;</div><div class="line">response.request = request;</div></pre></td></tr></table></figure></p>
+<ul>
+<li>ctx,request,response都有对app的引用，也是就是Koa()实例             </li>
+<li>ctx,request,response都有对原生request对象的引用       </li>
+<li>ctx,request,response都有对原生response对象的引用      </li>
+<li>request,response都有对content(ctx)的应用       </li>
+<li>request有对response的引用    </li>
+<li>response有对request的引用<br>还是用一张图来说明吧<br><img src="/blog/img/koa.jpg" alt="app,ctx,request,response,原生requst,response关系图"></li>
+</ul>
+<h3 id="application-js"><a href="#application-js" class="headerlink" title="application.js"></a>application.js</h3><p>删掉一些不重要的代码,仔细看注释<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div></pre></td><td class="code"><pre><div class="line">module.exports = class Application extends Emitter &#123;</div><div class="line">  /**</div><div class="line">   * Initialize a new `Application`.</div><div class="line">   *</div><div class="line">   * @api public</div><div class="line">   */</div><div class="line"></div><div class="line">  constructor() &#123;</div><div class="line">    super();</div><div class="line"></div><div class="line">    this.proxy = false;</div><div class="line">    this.middleware = [];</div><div class="line">    this.subdomainOffset = 2;</div><div class="line">    this.env = process.env.NODE_ENV || &apos;development&apos;;</div><div class="line">    this.context = Object.create(context);</div><div class="line">    this.request = Object.create(request);</div><div class="line">    this.response = Object.create(response);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  /**</div><div class="line">   * Shorthand for:</div><div class="line">   *</div><div class="line">   *    http.createServer(app.callback()).listen(...)</div><div class="line">   *</div><div class="line">   * @param &#123;Mixed&#125; ...</div><div class="line">   * @return &#123;Server&#125;</div><div class="line">   * @api public</div><div class="line">   */</div><div class="line"></div><div class="line">  listen() &#123;</div><div class="line">    debug(&apos;listen&apos;);</div><div class="line">    const server = http.createServer(this.callback());</div><div class="line">    return server.listen.apply(server, arguments);</div><div class="line">  &#125; </div><div class="line"></div><div class="line">  /**</div><div class="line">   * Use the given middleware `fn`.</div><div class="line">   *</div><div class="line">   * Old-style middleware will be converted.</div><div class="line">   *</div><div class="line">   * @param &#123;Function&#125; fn</div><div class="line">   * @return &#123;Application&#125; self</div><div class="line">   * @api public</div><div class="line">   */</div><div class="line"></div><div class="line">  use(fn) &#123;</div><div class="line">    if (typeof fn !== &apos;function&apos;) throw new TypeError(&apos;middleware must be a function!&apos;);</div><div class="line">    if (isGeneratorFunction(fn)) &#123;</div><div class="line">      deprecate(&apos;Support for generators will be removed in v3. &apos; +</div><div class="line">                &apos;See the documentation for examples of how to convert old middleware &apos; +</div><div class="line">                &apos;https://github.com/koajs/koa/blob/master/docs/migration.md&apos;);</div><div class="line">      fn = convert(fn);</div><div class="line">    &#125;</div><div class="line">    debug(&apos;use %s&apos;, fn._name || fn.name || &apos;-&apos;);</div><div class="line">    this.middleware.push(fn);</div><div class="line">    return this;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  /**</div><div class="line">   * Return a request handler callback</div><div class="line">   * for node&apos;s native http server.</div><div class="line">   *</div><div class="line">   * @return &#123;Function&#125;</div><div class="line">   * @api public</div><div class="line">   */</div><div class="line"></div><div class="line">  callback() &#123;</div><div class="line">    const fn = compose(this.middleware); //编译中间件</div><div class="line"></div><div class="line">    if (!this.listeners(&apos;error&apos;).length) this.on(&apos;error&apos;, this.onerror);//没有定义错误捕获，就采用默认的</div><div class="line"></div><div class="line">    const handleRequest = (req, res) =&gt; &#123;</div><div class="line">      res.statusCode = 404;</div><div class="line">      const ctx = this.createContext(req, res);</div><div class="line">      const onerror = err =&gt; ctx.onerror(err);</div><div class="line">      const handleResponse = () =&gt; respond(ctx);</div><div class="line">      onFinished(res, onerror);</div><div class="line">      return fn(ctx).then(handleResponse).catch(onerror);</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    return handleRequest;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  /**</div><div class="line">   * Initialize a new context.</div><div class="line">   *</div><div class="line">   * @api private</div><div class="line">   */</div><div class="line"></div><div class="line">  createContext(req, res) &#123;</div><div class="line">    const context = Object.create(this.context);</div><div class="line">    const request = context.request = Object.create(this.request);</div><div class="line">    const response = context.response = Object.create(this.response);</div><div class="line">    context.app = request.app = response.app = this;</div><div class="line">    context.req = request.req = response.req = req;</div><div class="line">    context.res = request.res = response.res = res;</div><div class="line">    request.ctx = response.ctx = context;</div><div class="line">    request.response = response;</div><div class="line">    response.request = request;</div><div class="line">    context.originalUrl = request.originalUrl = req.url;</div><div class="line">    context.cookies = new Cookies(req, res, &#123;</div><div class="line">      keys: this.keys,</div><div class="line">      secure: request.secure</div><div class="line">    &#125;);</div><div class="line">    request.ip = request.ips[0] || req.socket.remoteAddress || &apos;&apos;;</div><div class="line">    context.accept = request.accept = accepts(req);</div><div class="line">    context.state = &#123;&#125;;</div><div class="line">    return context;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  /**</div><div class="line">   * Default error handler.</div><div class="line">   *</div><div class="line">   * @param &#123;Error&#125; err</div><div class="line">   * @api private</div><div class="line">   */</div><div class="line"></div><div class="line">  onerror(err) &#123;</div><div class="line">    assert(err instanceof Error, `non-error thrown: $&#123;err&#125;`);</div><div class="line"></div><div class="line">    if (404 == err.status || err.expose) return;</div><div class="line">    if (this.silent) return;</div><div class="line"></div><div class="line">    const msg = err.stack || err.toString();</div><div class="line">    console.error();</div><div class="line">    console.error(msg.replace(/^/gm, &apos;  &apos;));</div><div class="line">    console.error();</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">/**</div><div class="line"> * Response helper.</div><div class="line"> */</div><div class="line"></div><div class="line">function respond(ctx) &#123;</div><div class="line">  // allow bypassing koa</div><div class="line">  if (false === ctx.respond) return;</div><div class="line"></div><div class="line">  const res = ctx.res;</div><div class="line">  if (!ctx.writable) return;</div><div class="line"></div><div class="line">  let body = ctx.body;</div><div class="line">  const code = ctx.status;</div><div class="line"></div><div class="line">  // ignore body</div><div class="line">  if (statuses.empty[code]) &#123;</div><div class="line">    // strip headers</div><div class="line">    ctx.body = null;</div><div class="line">    return res.end();</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  if (&apos;HEAD&apos; == ctx.method) &#123;</div><div class="line">    if (!res.headersSent &amp;&amp; isJSON(body)) &#123;</div><div class="line">      ctx.length = Buffer.byteLength(JSON.stringify(body));</div><div class="line">    &#125;</div><div class="line">    return res.end();</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  // status body</div><div class="line">  if (null == body) &#123;</div><div class="line">    body = ctx.message || String(code);</div><div class="line">    if (!res.headersSent) &#123;</div><div class="line">      ctx.type = &apos;text&apos;;</div><div class="line">      ctx.length = Buffer.byteLength(body);</div><div class="line">    &#125;</div><div class="line">    return res.end(body);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  // responses</div><div class="line">  if (Buffer.isBuffer(body)) return res.end(body);</div><div class="line">  if (&apos;string&apos; == typeof body) return res.end(body);</div><div class="line">  if (body instanceof Stream) return body.pipe(res);</div><div class="line"></div><div class="line">  // body: json</div><div class="line">  body = JSON.stringify(body);</div><div class="line">  if (!res.headersSent) &#123;</div><div class="line">    ctx.length = Buffer.byteLength(body);</div><div class="line">  &#125;</div><div class="line">  res.end(body);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="listen"><a href="#listen" class="headerlink" title="listen"></a>listen</h4><p>是http.createServer(app.callback()).listen(…)的一种便捷调用形式<br>要是网站使用https协议，那么就得<br>https.createServer(credentials,capp.callback()).listen(…)</p>
+<h4 id="use"><a href="#use" class="headerlink" title="use"></a>use</h4><p>存中间件的信息，当然中间对采用generator实现的中间件进行了提示<br>关于中间件里面的那个next，可以参看 <a href="http://www.cnblogs.com/cloud-/p/7239819.html" target="_blank" rel="external">koa2 中间件里面的next到底是什么 </a></p>
+<h4 id="callback"><a href="#callback" class="headerlink" title="callback"></a>callback</h4><p>  核心之核心,主要工作    </p>
+<ul>
+<li>编译中间件，</li>
+<li>错误函数定义</li>
+<li>执行中间件，</li>
+<li>对请求作出相应  </li>
+<li>如果有错误，错误处理    <h4 id="createContext"><a href="#createContext" class="headerlink" title="createContext"></a>createContext</h4>构建中间件里面的ctx<h4 id="onerror"><a href="#onerror" class="headerlink" title="onerror"></a>onerror</h4>默认错误捕捉函数<h4 id="respond"><a href="#respond" class="headerlink" title="respond"></a>respond</h4>实际作出相应的方法</li>
+</ul>
+
+        </div>
+        <footer class="article-footer">
+            
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+
+        </footer>
+    </div>
+</article>
+
+    <section id="comments">
+    
+        <!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zMDQxMy82OTY3">
+	<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+	</script>
+<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+    
+    </section>
+
+
+                        </div>
+                    </section>
+                    <aside id="sidebar">
+    <a class="sidebar-toggle" title="Expand Sidebar"><i class="toggle icon"></i></a>
+    <div class="sidebar-top">
+        <p>关注我 :</p>
+        <ul class="social-links">
+            
+                
+                <li>
+                    <a class="social-tooltip" title="github" href="https://github.com/xiangwenhu" target="_blank">
+                        <i class="icon fa fa-github"></i>
+                    </a>
+                </li>
+                
+            
+                
+                <li>
+                    <a class="social-tooltip" title="weixin" href="/blog/" target="_blank">
+                        <i class="icon fa fa-weixin"></i>
+                    </a>
+                </li>
+                
+            
+                
+                <li>
+                    <a class="social-tooltip" title="qq" href="/blog/" target="_blank">
+                        <i class="icon fa fa-qq"></i>
+                    </a>
+                </li>
+                
+            
+        </ul>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/blog/2017/08/09/Network/c&s/" id="article-nav-newer" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">下一篇</strong>
+        <p class="article-nav-title">
+        
+            cookie和session那点事
+        
+        </p>
+        <i class="icon fa fa-chevron-right" id="icon-chevron-right"></i>
+    </a>
+    
+    
+        <a href="/blog/2017/07/29/sourecode/koa-note/" id="article-nav-older" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">上一篇</strong>
+        <p class="article-nav-title">koa便签</p>
+        <i class="icon fa fa-chevron-left" id="icon-chevron-left"></i>
+        </a>
+    
+</nav>
+
+    
+    <div class="widgets-container">
+        
+            
+                
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="no-thumbnail">
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/blog/categories/源码/">源码</a></p>
+                            <p class="item-title"><a href="/blog/2017/08/22/sourecode/koa-router/" class="title">koa-router源码分析</a></p>
+                            <p class="item-date"><time datetime="2017-08-22T15:00:00.000Z" itemprop="datePublished">2017-08-22</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/blog/categories/源码/">源码</a></p>
+                            <p class="item-title"><a href="/blog/2017/08/22/sourecode/koa-router-router/" class="title">koa-router Router源码分析</a></p>
+                            <p class="item-date"><time datetime="2017-08-22T14:00:00.000Z" itemprop="datePublished">2017-08-22</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/blog/categories/源码/">源码</a></p>
+                            <p class="item-title"><a href="/blog/2017/08/22/sourecode/koa-router-layer/" class="title">koa-router Layer源码分析</a></p>
+                            <p class="item-date"><time datetime="2017-08-22T14:00:00.000Z" itemprop="datePublished">2017-08-22</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/blog/categories/其他/">其他</a><i class="icon fa fa-angle-right"></i><a class="article-category-link" href="/blog/categories/其他/github/">github</a></p>
+                            <p class="item-title"><a href="/blog/2017/08/19/other/blogwithhexo/" class="title">Hexo + Github搭建自己的博客</a></p>
+                            <p class="item-date"><time datetime="2017-08-19T14:00:00.000Z" itemprop="datePublished">2017-08-19</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/blog/categories/其他/">其他</a><i class="icon fa fa-angle-right"></i><a class="article-category-link" href="/blog/categories/其他/资源/">资源</a></p>
+                            <p class="item-title"><a href="/blog/2017/08/16/other/links/" class="title">一些链接</a></p>
+                            <p class="item-date"><time datetime="2017-08-16T08:00:00.000Z" itemprop="datePublished">2017-08-16</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/其他/">其他</a><span class="category-list-count">5</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/其他/github/">github</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/其他/浏览器/">浏览器</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/其他/网络/">网络</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/其他/资源/">资源</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/源码/">源码</a><span class="category-list-count">6</span></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/08/">八月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/07/">七月 2017</a><span class="archive-list-count">3</span></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/koa/">koa</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/koa-router/">koa-router</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/前端/">前端</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/浏览器/">浏览器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/网络/">网络</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-float">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/blog/tags/github/" style="font-size: 10px;">github</a> <a href="/blog/tags/koa/" style="font-size: 20px;">koa</a> <a href="/blog/tags/koa-router/" style="font-size: 20px;">koa-router</a> <a href="/blog/tags/前端/" style="font-size: 15px;">前端</a> <a href="/blog/tags/浏览器/" style="font-size: 10px;">浏览器</a> <a href="/blog/tags/网络/" style="font-size: 10px;">网络</a>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://www.cnblogs.com/cloud-/">cnblogs</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+            
+        
+    </div>
+</aside>
+                </div>
+            </div>
+        </div>
+        <footer id="footer">
+    <div class="container">
+        <div class="container-inner">
+            <a id="back-to-top" href="javascript:;"><i class="icon fa fa-angle-up"></i></a>
+            <div class="credit">
+                <h1 class="logo-wrap">
+                    <a href="/blog/" class="logo"></a>
+                </h1>
+                <p>&copy; 2017 云</p>
+                <p>Powered by <a href="//hexo.io/" target="_blank">Hexo</a>. Theme by <a href="//github.com/ppoffice" target="_blank">PPOffice</a></p>
+            </div>
+        </div>
+    </div>
+</footer>
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        
+
+
+    
+        <script src="/blog/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/blog/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/blog/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/blog/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/blog/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/blog/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/blog/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/blog/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/blog/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/blog/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/blog/js/main.js"></script>
+
+    </div>
+</body>
+</html>

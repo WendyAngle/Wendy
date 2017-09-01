@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    
+    <title>cookie和session那点事 | 云的空间</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+        <meta name="keywords" content="网络" />
+    
+    <meta name="description" content="Cookie 和 Session那么一点事cookie最终还是存在磁盘上的，比如chrome的cookie存放位置C:\Users\你当前用户名\AppData\Local\Google\Chrome\User Data\Default\ 大家都知道document.cookie是可以读取和设置的，这就说明cookie是可以伪造的。不用怕， Secure和HttpOnly为你保驾护航，当然这两个是">
+<meta name="keywords" content="网络">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cookie和session那点事">
+<meta property="og:url" content="https://xiangwenhu.github.io/2017/08/09/Network/c&s/index.html">
+<meta property="og:site_name" content="云的空间">
+<meta property="og:description" content="Cookie 和 Session那么一点事cookie最终还是存在磁盘上的，比如chrome的cookie存放位置C:\Users\你当前用户名\AppData\Local\Google\Chrome\User Data\Default\ 大家都知道document.cookie是可以读取和设置的，这就说明cookie是可以伪造的。不用怕， Secure和HttpOnly为你保驾护航，当然这两个是">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-08-21T01:48:45.918Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="cookie和session那点事">
+<meta name="twitter:description" content="Cookie 和 Session那么一点事cookie最终还是存在磁盘上的，比如chrome的cookie存放位置C:\Users\你当前用户名\AppData\Local\Google\Chrome\User Data\Default\ 大家都知道document.cookie是可以读取和设置的，这就说明cookie是可以伪造的。不用怕， Secure和HttpOnly为你保驾护航，当然这两个是">
+    
+
+    
+
+    
+
+    <link rel="stylesheet" href="/blog/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/blog/libs/titillium-web/styles.css">
+    <link rel="stylesheet" href="/blog/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/blog/css/style.css">
+
+    <script src="/blog/libs/jquery/2.0.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/blog/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/blog/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="wrap">
+        <header id="header">
+    <div id="header-outer" class="outer">
+        <div class="container">
+            <div class="container-inner">
+                <div id="header-title">
+                    <h1 class="logo-wrap">
+                        <a href="/blog/" class="logo"></a>
+                    </h1>
+                    
+                        <h2 class="subtitle-wrap">
+                            <p class="subtitle" style="line-height:80px">随笔，日记，博客，学习等集合体，打开它，总有收获</p>
+                            <p class="subtitle" style="line-height:30px;text-align:left;font-style:normal">
+                                <span id="busuanzi_container_site_pv">
+                                    总访问量<span id="busuanzi_value_site_pv" style="color:bisque">-</span>次
+                                </span>
+                                <span id="busuanzi_container_site_uv">
+                                    访客数<span id="busuanzi_value_site_uv" style="color:bisque">-</span>人次
+                                  </span>
+                            </p>
+                        </h2>
+                    
+                </div>
+                <div id="header-inner" class="nav-container">
+                    <a id="main-nav-toggle" class="nav-icon fa fa-bars"></a>
+                    <div class="nav-container-inner">
+                        <ul id="main-nav">
+                            
+                                <li class="main-nav-list-item" >
+                                    <a class="main-nav-list-link" href="/blog/">主页</a>
+                                </li>
+                            
+                                        <ul class="main-nav-list"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/其他/">其他</a><ul class="main-nav-list-child"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/其他/github/">github</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/其他/浏览器/">浏览器</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/其他/网络/">网络</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/其他/资源/">资源</a></li></ul></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/源码/">源码</a></li></ul>
+                                    
+                                <li class="main-nav-list-item" >
+                                    <a class="main-nav-list-link" href="/blog/about.html">关于</a>
+                                </li>
+                            
+                        </ul>
+                        <nav id="sub-nav">
+                            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/blog/',
+        CONTENT_URL: '/blog/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/blog/js/insight.js"></script>
+
+</div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+        <div class="container">
+            <div class="main-body container-inner">
+                <div class="main-body-inner">
+                    <section id="main">
+                        <div class="main-body-header">
+    <h1 class="header">
+    
+    <a class="page-title-link" href="/blog/categories/其他/">其他</a><i class="icon fa fa-angle-right"></i><a class="page-title-link" href="/blog/categories/其他/网络/">网络</a>
+    </h1>
+</div>
+                        <div class="main-body-content">
+                            <article id="post-Network/c&amp;s" class="article article-single article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+        cookie和session那点事
+        </h1>
+    
+
+            </header>
+         
+        
+            <div class="article-meta">
+                
+    <div class="article-date">
+        <a href="/blog/2017/08/09/Network/c&s/" class="article-date">
+            <time datetime="2017-08-09T05:00:00.000Z" itemprop="datePublished">2017-08-09</time>
+        </a>
+    </div>
+
+                
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/blog/tags/网络/">网络</a>
+    </div>
+
+            </div>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+            <h1 id="Cookie-和-Session那么一点事"><a href="#Cookie-和-Session那么一点事" class="headerlink" title="Cookie 和 Session那么一点事"></a>Cookie 和 Session那么一点事</h1><p>cookie最终还是存在磁盘上的，比如chrome的cookie存放位置<br>C:\Users\你当前用户名\AppData\Local\Google\Chrome\User Data\Default\</p>
+<p>大家都知道document.cookie是可以读取和设置的，这就说明cookie是可以伪造的。<br>不用怕， Secure和HttpOnly为你保驾护航，当然这两个是用在服务端的。  </p>
+<p>查看cookie可以设置的属性可以查看<br><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie" target="_blank" rel="external">Set-Cookie - HTTP | MDN </a>  </p>
+<h4 id="Secure属性："><a href="#Secure属性：" class="headerlink" title="Secure属性："></a>Secure属性：</h4><p>当设置为true时，表示创建的 Cookie 会被以安全的形式向服务器传输，也就是只能在 HTTPS 连接中被浏览器传递到服务器端进行会话验证，如果是 HTTP 连接则不会传递该信息，所以不会被窃取到Cookie 的具体内容。</p>
+<h4 id="HttpOnly属性："><a href="#HttpOnly属性：" class="headerlink" title="HttpOnly属性："></a>HttpOnly属性：</h4><p>如果在Cookie中设置了”HttpOnly”属性，那么通过程序(JS脚本、Applet等)将无法读取到Cookie信息，这样能有效的防止XSS攻击。</p>
+<p>借用知乎某个仁兄的话</p>
+<h4 id="cookie和session关联"><a href="#cookie和session关联" class="headerlink" title="cookie和session关联"></a>cookie和session关联</h4><ol>
+<li>session 在服务器端，cookie 在客户端（浏览器）    </li>
+<li>session 默认被存在在服务器的一个文件里（不是内存）    </li>
+<li>session 的运行依赖 session id，而 session id 是存在 cookie 中的，也就是说，如果浏览器禁用了 cookie ，同时 session 也会失效（但是可以通过其它方式实现，比如在 url 中传递 session_id）   </li>
+<li>session 可以放在 文件、数据库、或内存中都可以。    </li>
+<li>用户验证这种场合一般会用 session 因此，维持一个会话的核心就是客户端的唯一标识，即 session id   </li>
+</ol>
+<h2 id="额外的话"><a href="#额外的话" class="headerlink" title="额外的话"></a>额外的话</h2><ul>
+<li>你从开发者工具，直接删除存在cookie里面的session id，刷新页面，session id是会更新的，被认为是新的会话，同理，你在某个网站登录了，强行删除session id，刷新页面会回到登录页面的。</li>
+<li>存在cookie里面的session id 的key名字是可以修改的，曾今我们就发生过两个网站key值相同，会乱串，甚至会网站奔溃的情况</li>
+<li>不同浏览器当然是不共享cookie的</li>
+<li>cookie是每次http请求都会附带上的，所以尽量少</li>
+<li>cookie同一个域名下的用户是共享cookie的</li>
+<li>cookie是可以禁用的</li>
+<li>cookie不允许跨域的，通过设置，二级域名可以使用</li>
+</ul>
+<blockquote>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie" target="_blank" rel="external">Set-Cookie - HTTP | MDN </a><br><a href="http://blog.csdn.net/fangaoxin/article/details/6952954" target="_blank" rel="external">Cookie/Session机制详解</a><br><a href="http://blog.sina.com.cn/s/blog_67196ddc0102v46w.html" target="_blank" rel="external">禁止js获取sessionid</a><br><a href="https://segmentfault.com/a/1190000004743454" target="_blank" rel="external">常用的本地存储——cookie篇</a><br><a href="http://www.cnblogs.com/fish-li/archive/2011/07/03/2096903.html" target="_blank" rel="external">细说cookie</a><br><a href="https://www.zhihu.com/question/19786827" target="_blank" rel="external">COOKIE和SESSION有什么区别</a></p>
+</blockquote>
+
+        </div>
+        <footer class="article-footer">
+            
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+
+        </footer>
+    </div>
+</article>
+
+    <section id="comments">
+    
+        <!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zMDQxMy82OTY3">
+	<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+	</script>
+<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+    
+    </section>
+
+
+                        </div>
+                    </section>
+                    <aside id="sidebar">
+    <a class="sidebar-toggle" title="Expand Sidebar"><i class="toggle icon"></i></a>
+    <div class="sidebar-top">
+        <p>关注我 :</p>
+        <ul class="social-links">
+            
+                
+                <li>
+                    <a class="social-tooltip" title="github" href="https://github.com/xiangwenhu" target="_blank">
+                        <i class="icon fa fa-github"></i>
+                    </a>
+                </li>
+                
+            
+                
+                <li>
+                    <a class="social-tooltip" title="weixin" href="/blog/" target="_blank">
+                        <i class="icon fa fa-weixin"></i>
+                    </a>
+                </li>
+                
+            
+                
+                <li>
+                    <a class="social-tooltip" title="qq" href="/blog/" target="_blank">
+                        <i class="icon fa fa-qq"></i>
+                    </a>
+                </li>
+                
+            
+        </ul>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/blog/2017/08/10/other/markdown/" id="article-nav-newer" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">下一篇</strong>
+        <p class="article-nav-title">
+        
+            markdown语法
+        
+        </p>
+        <i class="icon fa fa-chevron-right" id="icon-chevron-right"></i>
+    </a>
+    
+    
+        <a href="/blog/2017/07/29/sourecode/koa/" id="article-nav-older" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">上一篇</strong>
+        <p class="article-nav-title">koa源码分析</p>
+        <i class="icon fa fa-chevron-left" id="icon-chevron-left"></i>
+        </a>
+    
+</nav>
+
+    
+    <div class="widgets-container">
+        
+            
+                
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="no-thumbnail">
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/blog/categories/源码/">源码</a></p>
+                            <p class="item-title"><a href="/blog/2017/08/22/sourecode/koa-router/" class="title">koa-router源码分析</a></p>
+                            <p class="item-date"><time datetime="2017-08-22T15:00:00.000Z" itemprop="datePublished">2017-08-22</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/blog/categories/源码/">源码</a></p>
+                            <p class="item-title"><a href="/blog/2017/08/22/sourecode/koa-router-router/" class="title">koa-router Router源码分析</a></p>
+                            <p class="item-date"><time datetime="2017-08-22T14:00:00.000Z" itemprop="datePublished">2017-08-22</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/blog/categories/源码/">源码</a></p>
+                            <p class="item-title"><a href="/blog/2017/08/22/sourecode/koa-router-layer/" class="title">koa-router Layer源码分析</a></p>
+                            <p class="item-date"><time datetime="2017-08-22T14:00:00.000Z" itemprop="datePublished">2017-08-22</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/blog/categories/其他/">其他</a><i class="icon fa fa-angle-right"></i><a class="article-category-link" href="/blog/categories/其他/github/">github</a></p>
+                            <p class="item-title"><a href="/blog/2017/08/19/other/blogwithhexo/" class="title">Hexo + Github搭建自己的博客</a></p>
+                            <p class="item-date"><time datetime="2017-08-19T14:00:00.000Z" itemprop="datePublished">2017-08-19</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/blog/categories/其他/">其他</a><i class="icon fa fa-angle-right"></i><a class="article-category-link" href="/blog/categories/其他/资源/">资源</a></p>
+                            <p class="item-title"><a href="/blog/2017/08/16/other/links/" class="title">一些链接</a></p>
+                            <p class="item-date"><time datetime="2017-08-16T08:00:00.000Z" itemprop="datePublished">2017-08-16</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/其他/">其他</a><span class="category-list-count">5</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/其他/github/">github</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/其他/浏览器/">浏览器</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/其他/网络/">网络</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/其他/资源/">资源</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/源码/">源码</a><span class="category-list-count">6</span></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/08/">八月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/07/">七月 2017</a><span class="archive-list-count">3</span></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/koa/">koa</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/koa-router/">koa-router</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/前端/">前端</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/浏览器/">浏览器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/网络/">网络</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-float">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/blog/tags/github/" style="font-size: 10px;">github</a> <a href="/blog/tags/koa/" style="font-size: 20px;">koa</a> <a href="/blog/tags/koa-router/" style="font-size: 20px;">koa-router</a> <a href="/blog/tags/前端/" style="font-size: 15px;">前端</a> <a href="/blog/tags/浏览器/" style="font-size: 10px;">浏览器</a> <a href="/blog/tags/网络/" style="font-size: 10px;">网络</a>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://www.cnblogs.com/cloud-/">cnblogs</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+            
+        
+    </div>
+</aside>
+                </div>
+            </div>
+        </div>
+        <footer id="footer">
+    <div class="container">
+        <div class="container-inner">
+            <a id="back-to-top" href="javascript:;"><i class="icon fa fa-angle-up"></i></a>
+            <div class="credit">
+                <h1 class="logo-wrap">
+                    <a href="/blog/" class="logo"></a>
+                </h1>
+                <p>&copy; 2017 云</p>
+                <p>Powered by <a href="//hexo.io/" target="_blank">Hexo</a>. Theme by <a href="//github.com/ppoffice" target="_blank">PPOffice</a></p>
+            </div>
+        </div>
+    </div>
+</footer>
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        
+
+
+    
+        <script src="/blog/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/blog/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/blog/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/blog/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/blog/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/blog/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/blog/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/blog/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/blog/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/blog/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/blog/js/main.js"></script>
+
+    </div>
+</body>
+</html>
