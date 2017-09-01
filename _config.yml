@@ -3,12 +3,12 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Wendy的空间
-subtitle: 爱分享，爱生活
-description: des
-author: author
+title: Wendy's Zone
+subtitle: Loves sharing, loves life
+description: summary
+author: Wendy
 language: zh-CN
-timezone: Asia/Shanghai
+timezone: Asia/Beijing
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
