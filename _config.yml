@@ -3,17 +3,17 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: 云的空间
-subtitle: 随笔，日记，博客，学习等集合体，打开它，总有收获
-description: 永不停歇，探无止境
-author: 云
+title: Wendy的空间
+subtitle: subtitle
+description: des
+author: author
 language: zh-CN
 timezone: Asia/Shanghai
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: https://xiangwenhu.github.io
-root: /blog/
+url: https://wendyangle.github.io
+root: /Wendy/
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 
