@@ -78,7 +78,7 @@ theme: hueman
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/xiangwenhu/blog.git
+  repo: https://github.com/WendyAngle/Wendy.git
   branch: master
 
 # disqus
